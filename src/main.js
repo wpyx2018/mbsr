@@ -7,10 +7,13 @@ import ElementUI from "element-ui";
 import "element-ui/lib/theme-chalk/index.css";
 import iView from "iview";
 import "iview/dist/styles/iview.css";
-import '../src/assets/iconfonts/iconfont.js'
+import '../src/assets/iconfonts/iconfont.js';
+import Axios from "axios";
+
+Vue.prototype.$ajax = Axios;
 Vue.use(iView);
 Vue.use(ElementUI);
-Vue.config.productionTip = false
+Vue.config.productionTip = false;
 
 /* eslint-disable no-new */
 new Vue({

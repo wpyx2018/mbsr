@@ -8,7 +8,7 @@
         <td rowspan="2" style="width:70px;">
           <div style="display:flex;flex-direction:row;">
             <div class="zhou">{{selected}}</div>
-            <select v-model="selected" class="selection">
+            <select @change="change2" v-model="selected" class="selection">
               <option v-for="option in options" :value="option.value">{{ option.text }}</option>
             </select>
           </div>
@@ -34,30 +34,50 @@
         <td class="head2">3分钟呼吸空间</td>
         <td class="head2">正念伸展</td>
       </tr>
-      <tr v-for="item in tableData">
-        <td ref="chengyuan" @click="routerto(item.id)">{{item.chengyuan}}</td>
+      <tr v-for="(item,index) in userPracticeList">
+        <td @click="routerto(index)">{{item.userName}}</td>
         <td>
-          <svg v-show="item.shenti==1?true:false" class="icon" aria-hidden="true">
+          <svg
+            v-show="item.itemPracticeList[0].itemStatus==1?true:false"
+            class="icon"
+            aria-hidden="true"
+          >
             <use xlink:href="#icon-Fillx"></use>
           </svg>
         </td>
         <td>
-          <svg v-show="item.zhuanzhu==1?true:false" class="icon" aria-hidden="true">
+          <svg
+            v-show="item.itemPracticeList[1].itemStatus==1?true:false"
+            class="icon"
+            aria-hidden="true"
+          >
             <use xlink:href="#icon-Fillx"></use>
           </svg>
         </td>
         <td>
-          <svg v-show="item.zhengnian==1?true:false" class="icon" aria-hidden="true">
+          <svg
+            v-show="item.itemPracticeList[2].itemStatus==1?true:false"
+            class="icon"
+            aria-hidden="true"
+          >
             <use xlink:href="#icon-Fillx"></use>
           </svg>
         </td>
         <td>
-          <svg v-show="item.huxi==1?true:false" class="icon" aria-hidden="true">
+          <svg
+            v-show="item.itemPracticeList[3].itemStatus==1?true:false"
+            class="icon"
+            aria-hidden="true"
+          >
             <use xlink:href="#icon-Fillx"></use>
           </svg>
         </td>
         <td>
-          <svg v-show="item.shenzhan==1?true:false" class="icon" aria-hidden="true">
+          <svg
+            v-show="item.itemPracticeList[4].itemStatus==1?true:false"
+            class="icon"
+            aria-hidden="true"
+          >
             <use xlink:href="#icon-Fillx"></use>
           </svg>
         </td>
@@ -72,8 +92,11 @@ export default {
   data() {
     return {
       zhou: "",
+      itemList: [],
       selected: "第一周",
       value: "",
+      weeks: 1,
+      days: 1,
       options: [
         {
           value: "第一周",
@@ -108,52 +131,83 @@ export default {
           text: "第八周"
         }
       ],
-      tableData: [
-        {
-          id: 1,
-          chengyuan: "张三三",
-          shenti: 1,
-          zhuanzhu: 0,
-          zhengnian: 1,
-          huxi: 1,
-          shenzhan: 0
-        },
-        {
-          id: 2,
-          chengyuan: "李四四",
-          shenti: 0,
-          zhuanzhu: 1,
-          zhengnian: 1,
-          huxi: 0,
-          shenzhan: 1
-        },
-        {
-          id: 3,
-          chengyuan: "王五五",
-          shenti: 0,
-          zhuanzhu: 1,
-          zhengnian: 1,
-          huxi: 0,
-          shenzhan: 1
-        }
-      ]
+      userPracticeList: []
     };
   },
   methods: {
+    getData(url) {
+      this.$ajax
+        .get(url)
+        .then(res => {
+          this.itemList = res.data.itemList;
+          this.userPracticeList = res.data.userPracticeList;
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
     change(v) {
       this.value = v.target.innerHTML;
       var str = v.target.innerHTML;
-      var id = str.substr(str.length - 1, 1);
-      //根据id请求数据
-      //console.log(id);
+      var days = str.substr(str.length - 1, 1);
+      //根据days请求数据
+      console.log(days);
+      this.days = days;
+      this.getData(
+        `http://www.dgli.net:8888/practiceActivity/getMemberData?books=1&weeks=${
+          this.weeks
+        }&days=${this.days}`
+      );
+    },
+    change2() {
+      var selected = this.selected;
+      //console.log(selected);
+      var weeks = 1;
+      switch (selected) {
+        case "第一周":
+          weeks = 1;
+          break;
+        case "第二周":
+          weeks = 2;
+          break;
+        case "第三周":
+          weeks = 3;
+          break;
+        case "第四周":
+          weeks = 4;
+          break;
+        case "第五周":
+          weeks = 5;
+          break;
+        case "第六周":
+          weeks = 6;
+          break;
+        case "第七周":
+          weeks = 7;
+          break;
+        case "第八周":
+          weeks = 8;
+      }
+      this.weeks = weeks;
+      //console.log(weeks);
+      this.getData(
+        `http://www.dgli.net:8888/practiceActivity/getMemberData?books=1&weeks=${
+          this.weeks
+        }&days=${this.days}`
+      );
     },
     routerto(id) {
-      //console.log(id);
+      console.log(id + 1);
+      var id = id + 1;
       //根据id进行路由跳转
       this.$router.push("/geren?id=" + id);
     }
   },
-  created() {}
+  created() {
+    this.getData(
+      `http://www.dgli.net:8888/practiceActivity/getMemberData?books=1&weeks=1&days=1`
+    );
+  }
 };
 </script>
 
@@ -163,7 +217,7 @@ export default {
   font-size: 12px;
 }
 .icon {
-  width: 4em;
+  width: 34px;
   height: 20px;
   position: relative;
   top: 3px;
@@ -188,7 +242,8 @@ table th {
 
 table td {
   border: solid 2px rgb(160, 160, 160);
-  width: 40px;
+  width: 50px;
+  height: 30px;
 }
 table td:nth-child(1) {
   padding: 0;

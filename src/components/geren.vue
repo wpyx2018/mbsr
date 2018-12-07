@@ -5,7 +5,7 @@
         <td rowspan="2" style="width:1px;">
           <div style="display:flex;flex-direction:row;">
             <div class="zhou">{{selected}}</div>
-            <select v-model="selected" class="selection">
+            <select @change="change" v-model="selected" class="selection">
               <option v-for="option in options" :value="option.value">{{ option.text }}</option>
             </select>
           </div>
@@ -13,39 +13,41 @@
         <td style="background: rgb(127, 214, 127);">成员：{{chengyuan}}</td>
       </tr>
     </table>
-    <table class="table2">
+    <table>
       <tr>
         <td class="head2">时间</td>
-        <td class="head2">身体扫描</td>
+        <td class="head2"></td>
         <td class="head2">专注：九点练习</td>
         <td class="head2">正念饮食</td>
         <td class="head2">3分钟呼吸空间</td>
         <td class="head2">正念伸展</td>
       </tr>
-      <tr v-for="list in tableData">
-        <td>{{list.riqi}}</td>
+    </table>
+    <table class="table2">
+      <tr v-for="(item,index) in userPracticeList">
+        <td>D{{item.days}}</td>
         <td>
-          <svg v-show="list.shijian==1?true:false" class="icon" aria-hidden="true">
+          <svg v-show="item.itemPraList[0].status==1?true:false" class="icon" aria-hidden="true">
             <use xlink:href="#icon-Fillx"></use>
           </svg>
         </td>
         <td>
-          <svg v-show="list.zhuanzhu==1?true:false" class="icon" aria-hidden="true">
+          <svg v-show="item.itemPraList[1].status==1?true:false" class="icon" aria-hidden="true">
             <use xlink:href="#icon-Fillx"></use>
           </svg>
         </td>
         <td>
-          <svg v-show="list.zhengnian==1?true:false" class="icon" aria-hidden="true">
+          <svg v-show="item.itemPraList[2].status==1?true:false" class="icon" aria-hidden="true">
             <use xlink:href="#icon-Fillx"></use>
           </svg>
         </td>
         <td>
-          <svg v-show="list.huxi==1?true:false" class="icon" aria-hidden="true">
+          <svg v-show="item.itemPraList[3].status?true:false" class="icon" aria-hidden="true">
             <use xlink:href="#icon-Fillx"></use>
           </svg>
         </td>
         <td>
-          <svg v-show="list.shenzhan==1?true:false" class="icon" aria-hidden="true">
+          <svg v-show="item.itemPraList[4].status==1?true:false" class="icon" aria-hidden="true">
             <use xlink:href="#icon-Fillx"></use>
           </svg>
         </td>
@@ -63,6 +65,8 @@ export default {
       selected: "第一周",
       value: "",
       chengyuan: "",
+      userId: 1,
+      weeks: 1,
       options: [
         {
           value: "第一周",
@@ -97,98 +101,86 @@ export default {
           text: "第八周"
         }
       ],
-      tableData: [
-        {
-          riqi: "D1",
-          shijian: 1,
-          zhuanzhu: 0,
-          zhengnian: 1,
-          huxi: 1,
-          shenzhan: 0
-        },
-        {
-          riqi: "D2",
-          shijian: 0,
-          zhuanzhu: 1,
-          zhengnian: 1,
-          huxi: 0,
-          shenzhan: 1
-        },
-        {
-          riqi: "D3",
-          shijian: 0,
-          zhuanzhu: 1,
-          zhengnian: 0,
-          huxi: 0,
-          shenzhan: 1
-        },
-        {
-          riqi: "D4",
-          shijian: 0,
-          zhuanzhu: 1,
-          zhengnian: 1,
-          huxi: 0,
-          shenzhan: 0
-        },
-        {
-          riqi: "D5",
-          shijian: 0,
-          zhuanzhu: 1,
-          zhengnian: 1,
-          huxi: 0,
-          shenzhan: 1
-        },
-        {
-          riqi: "D6",
-          shijian: 0,
-          zhuanzhu: 0,
-          zhengnian: 1,
-          huxi: 0,
-          shenzhan: 1
-        },
-        {
-          riqi: "D7",
-          shijian: 0,
-          zhuanzhu: 1,
-          zhengnian: 0,
-          huxi: 0,
-          shenzhan: 1
-        }
-      ],
-      tableData2: [
-        {
-          id: 1,
-          chengyuan: "张三三",
-          shenti: 1,
-          zhuanzhu: 0,
-          zhengnian: 1,
-          huxi: 1,
-          shenzhan: 0
-        },
-        {
-          id: 2,
-          chengyuan: "李四四",
-          shenti: 0,
-          zhuanzhu: 1,
-          zhengnian: 1,
-          huxi: 0,
-          shenzhan: 1
-        },
-        {
-          id: 3,
-          chengyuan: "王五五",
-          shenti: 0,
-          zhuanzhu: 1,
-          zhengnian: 1,
-          huxi: 0,
-          shenzhan: 1
-        }
-      ]
+      userPracticeList: [],
+      itemPraList: []
     };
+  },
+  methods: {
+    change() {
+      var selected = this.selected;
+      //console.log(selected);
+      var weeks = 1;
+      switch (selected) {
+        case "第一周":
+          weeks = 1;
+          break;
+        case "第二周":
+          weeks = 2;
+          break;
+        case "第三周":
+          weeks = 3;
+          break;
+        case "第四周":
+          weeks = 4;
+          break;
+        case "第五周":
+          weeks = 5;
+          break;
+        case "第六周":
+          weeks = 6;
+          break;
+        case "第七周":
+          weeks = 7;
+          break;
+        case "第八周":
+          weeks = 8;
+      }
+      this.weeks = weeks;
+      //console.log(weeks);
+      this.$ajax
+        .get(
+          `http://www.dgli.net:8888/practiceActivity/getDataByUser?books=1&weeks=${
+            this.weeks
+          }&userId=${this.userId}`
+        )
+        .then(res => {
+          this.userPracticeList = res.data.userPracticeList;
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    }
   },
   created() {
     var id = this.$route.query.id;
-    this.chengyuan = this.tableData2[id - 1].chengyuan;
+    //console.log(id);
+    this.$ajax
+      .get(
+        "http://www.dgli.net:8888/practiceActivity/getMemberData?books=1&weeks=1&days=1"
+      )
+      .then(res => {
+        this.chengyuan = res.data.userPracticeList[id - 1].userName;
+        console.log(this.chengyuan);
+        this.userId = res.data.userPracticeList[id - 1].userId;
+        console.log(this.userId);
+        this.$ajax
+          .get(
+            `http://www.dgli.net:8888/practiceActivity/getDataByUser?books=1&weeks=1&userId=${
+              this.userId
+            }`
+          )
+          .then(res => {
+            //item.itemPraList[0]
+            console.log(res.data.userPracticeList);
+            this.userPracticeList = res.data.userPracticeList;
+          })
+          .catch(err => {
+            console.log(err);
+          });
+      })
+      .catch(err => {
+        console.log(err);
+      });
   }
 };
 </script>

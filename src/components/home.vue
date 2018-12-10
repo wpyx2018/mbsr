@@ -28,56 +28,12 @@
     <table class="table2">
       <tr>
         <td class="head2">成员</td>
-        <td class="head2">身体扫描</td>
-        <td class="head2">专注：九点练习</td>
-        <td class="head2">正念饮食</td>
-        <td class="head2">3分钟呼吸空间</td>
-        <td class="head2">正念伸展</td>
+        <td v-for="(item,index) in itemList" class="head2">{{item.name}}</td>
       </tr>
       <tr v-for="(item,index) in userPracticeList">
         <td @click="routerto(index)">{{item.userName}}</td>
-        <td>
-          <svg
-            v-show="item.itemPracticeList[0].itemStatus==1?true:false"
-            class="icon"
-            aria-hidden="true"
-          >
-            <use xlink:href="#icon-Fillx"></use>
-          </svg>
-        </td>
-        <td>
-          <svg
-            v-show="item.itemPracticeList[1].itemStatus==1?true:false"
-            class="icon"
-            aria-hidden="true"
-          >
-            <use xlink:href="#icon-Fillx"></use>
-          </svg>
-        </td>
-        <td>
-          <svg
-            v-show="item.itemPracticeList[2].itemStatus==1?true:false"
-            class="icon"
-            aria-hidden="true"
-          >
-            <use xlink:href="#icon-Fillx"></use>
-          </svg>
-        </td>
-        <td>
-          <svg
-            v-show="item.itemPracticeList[3].itemStatus==1?true:false"
-            class="icon"
-            aria-hidden="true"
-          >
-            <use xlink:href="#icon-Fillx"></use>
-          </svg>
-        </td>
-        <td>
-          <svg
-            v-show="item.itemPracticeList[4].itemStatus==1?true:false"
-            class="icon"
-            aria-hidden="true"
-          >
+        <td v-for="item2 in item.itemPracticeList" :key="item2.item">
+          <svg v-show="item2.itemStatus==1?true:false" class="icon" aria-hidden="true">
             <use xlink:href="#icon-Fillx"></use>
           </svg>
         </td>
@@ -139,6 +95,7 @@ export default {
       this.$ajax
         .get(url)
         .then(res => {
+          //console.log(res.data.itemList[0]);
           this.itemList = res.data.itemList;
           this.userPracticeList = res.data.userPracticeList;
         })
@@ -151,12 +108,10 @@ export default {
       var str = v.target.innerHTML;
       var days = str.substr(str.length - 1, 1);
       //根据days请求数据
-      console.log(days);
+      //console.log(days);
       this.days = days;
       this.getData(
-        `http://www.dgli.net:8888/practiceActivity/getMemberData?books=1&weeks=${
-          this.weeks
-        }&days=${this.days}`
+        `getMemberData?books=1&weeks=${this.weeks}&days=${this.days}`
       );
     },
     change2() {
@@ -191,22 +146,18 @@ export default {
       this.weeks = weeks;
       //console.log(weeks);
       this.getData(
-        `http://www.dgli.net:8888/practiceActivity/getMemberData?books=1&weeks=${
-          this.weeks
-        }&days=${this.days}`
+        `getMemberData?books=1&weeks=${this.weeks}&days=${this.days}`
       );
     },
     routerto(id) {
-      console.log(id + 1);
+      //console.log(id + 1);
       var id = id + 1;
       //根据id进行路由跳转
       this.$router.push("/geren?id=" + id);
     }
   },
   created() {
-    this.getData(
-      `http://www.dgli.net:8888/practiceActivity/getMemberData?books=1&weeks=1&days=1`
-    );
+    this.getData(`getMemberData?books=1&weeks=1&days=1`);
   }
 };
 </script>
@@ -259,7 +210,7 @@ table td:nth-child(1) {
 .selection {
   text-align: center;
   width: 19px;
-  height: 60px;
+  height: 66px;
   padding: 0;
   background: rgb(236, 235, 235);
 }
@@ -267,7 +218,7 @@ table td:nth-child(1) {
   background: rgb(127, 214, 127);
 }
 .zhou {
-  margin: 20px auto;
+  margin: 25px auto;
   text-align: center;
 }
 </style>

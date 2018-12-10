@@ -1,7 +1,9 @@
 
 <template>
   <div id="app">
-    <router-view/>
+    <transition name="fade" mode="out-in">
+      <router-view></router-view>
+    </transition>
   </div>
 </template>
 <script>
@@ -9,15 +11,23 @@ export default {
   name: "App"
 };
 </script>
-<style>
+<style >
+.fade-enter-active,
+.router-leave-active {
+  transition: opacity 1s;
+}
+.fade-enter,
+.router-leave-to {
+  opacity: 0;
+}
 #app {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 * {
-  padding: 0;
   margin: 0;
+  padding: 0;
 }
 html,
 body,

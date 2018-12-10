@@ -13,41 +13,15 @@
         <td style="background: rgb(127, 214, 127);">成员：{{chengyuan}}</td>
       </tr>
     </table>
-    <table>
+    <table class="table2">
       <tr>
         <td class="head2">时间</td>
-        <td class="head2"></td>
-        <td class="head2">专注：九点练习</td>
-        <td class="head2">正念饮食</td>
-        <td class="head2">3分钟呼吸空间</td>
-        <td class="head2">正念伸展</td>
+        <td v-for="(item,index) in newallItemList" class="head2">{{item.name}}</td>
       </tr>
-    </table>
-    <table class="table2">
-      <tr v-for="(item,index) in userPracticeList">
+      <tr v-for="(item,index) in newuserPracticeList">
         <td>D{{item.days}}</td>
-        <td>
-          <svg v-show="item.itemPraList[0].status==1?true:false" class="icon" aria-hidden="true">
-            <use xlink:href="#icon-Fillx"></use>
-          </svg>
-        </td>
-        <td>
-          <svg v-show="item.itemPraList[1].status==1?true:false" class="icon" aria-hidden="true">
-            <use xlink:href="#icon-Fillx"></use>
-          </svg>
-        </td>
-        <td>
-          <svg v-show="item.itemPraList[2].status==1?true:false" class="icon" aria-hidden="true">
-            <use xlink:href="#icon-Fillx"></use>
-          </svg>
-        </td>
-        <td>
-          <svg v-show="item.itemPraList[3].status?true:false" class="icon" aria-hidden="true">
-            <use xlink:href="#icon-Fillx"></use>
-          </svg>
-        </td>
-        <td>
-          <svg v-show="item.itemPraList[4].status==1?true:false" class="icon" aria-hidden="true">
+        <td v-for="(item2,index) in item.itemPraList" :class="item2.chooseStatus?'':'blackgr' " >
+          <svg v-show="item2.status==1?true:false" class="icon" aria-hidden="true">
             <use xlink:href="#icon-Fillx"></use>
           </svg>
         </td>
@@ -101,11 +75,33 @@ export default {
           text: "第八周"
         }
       ],
-      userPracticeList: [],
-      itemPraList: []
+      newuserPracticeList: [],
+      newallItemList: []
     };
   },
   methods: {
+    getData(url){
+       this.$ajax
+        .get(url)
+        .then(res => {
+           var olduserPracticeList = res.data.userPracticeList;
+           var oldallItemList=res.data.allItemList;
+           var length1=oldallItemList.length;
+           for(var i=0;i<olduserPracticeList.length;i++){
+            if(length1-olduserPracticeList[i].itemPraList.length==1){
+              olduserPracticeList[i].itemPraList.push({});
+            }
+            if(length1-olduserPracticeList[i].itemPraList.length==2){
+              olduserPracticeList[i].itemPraList.push({},{});
+            }
+          }
+          this.newuserPracticeList=olduserPracticeList
+          this.newallItemList=oldallItemList;
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
     change() {
       var selected = this.selected;
       //console.log(selected);
@@ -137,18 +133,9 @@ export default {
       }
       this.weeks = weeks;
       //console.log(weeks);
-      this.$ajax
-        .get(
-          `http://www.dgli.net:8888/practiceActivity/getDataByUser?books=1&weeks=${
+      this.getData( `getDataByUser?books=1&weeks=${
             this.weeks
-          }&userId=${this.userId}`
-        )
-        .then(res => {
-          this.userPracticeList = res.data.userPracticeList;
-        })
-        .catch(err => {
-          console.log(err);
-        });
+          }&userId=${this.userId}`);
     }
   },
   created() {
@@ -156,27 +143,16 @@ export default {
     //console.log(id);
     this.$ajax
       .get(
-        "http://www.dgli.net:8888/practiceActivity/getMemberData?books=1&weeks=1&days=1"
+        "getMemberData?books=1&weeks=1&days=1"
       )
       .then(res => {
         this.chengyuan = res.data.userPracticeList[id - 1].userName;
-        console.log(this.chengyuan);
+        //console.log(this.chengyuan);
         this.userId = res.data.userPracticeList[id - 1].userId;
-        console.log(this.userId);
-        this.$ajax
-          .get(
-            `http://www.dgli.net:8888/practiceActivity/getDataByUser?books=1&weeks=1&userId=${
+       // console.log(this.userId);
+        this.getData(`getDataByUser?books=1&weeks=1&userId=${
               this.userId
-            }`
-          )
-          .then(res => {
-            //item.itemPraList[0]
-            console.log(res.data.userPracticeList);
-            this.userPracticeList = res.data.userPracticeList;
-          })
-          .catch(err => {
-            console.log(err);
-          });
+            }`);
       })
       .catch(err => {
         console.log(err);
@@ -191,7 +167,7 @@ export default {
   font-size: 12px;
 }
 .icon {
-  width: 4em;
+  width: 34px;
   height: 20px;
   position: relative;
   top: 3px;
@@ -215,8 +191,9 @@ table th {
 }
 
 table td {
-  width: 54px;
   border: solid 2px rgb(160, 160, 160);
+  width: 52px;
+  height: 40px;
 }
 table td:nth-child(1) {
   padding: 0;
@@ -243,4 +220,8 @@ table td:nth-child(1) {
   margin: 20px auto;
   text-align: center;
 }
+.blackgr{
+  background-color: rgb(236, 235, 235);
+}
+
 </style>

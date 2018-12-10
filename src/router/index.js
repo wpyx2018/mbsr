@@ -4,7 +4,8 @@ import Router from "vue-router";
 Vue.use(Router);
 
 export default new Router({
-    mode: 'history',
+    //mode: 'history',
+    linkActiveClass: "mui-active", //更改活动链接的class类名，可以用style自定义样式
     routes: [{
             path: "/",
             name: "Home",

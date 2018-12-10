@@ -16,11 +16,11 @@
     <table class="table2">
       <tr>
         <td class="head2">时间</td>
-        <td v-for="(item,index) in newallItemList" class="head2">{{item.name}}</td>
+        <td v-for="(item,index) in newallItemLists" class="head2">{{item.name}}</td>
       </tr>
-      <tr v-for="(item,index) in newuserPracticeList">
+      <tr v-for="(item,index) in newuserPracticeLists">
         <td>D{{item.days}}</td>
-        <td v-for="(item2,index) in item.itemPraList" :class="item2.chooseStatus?'':'blackgr' " >
+        <td v-for="(item2,index) in item.itemPraList" :class="item2.chooseStatus?'':'blackgr' ">
           <svg v-show="item2.status==1?true:false" class="icon" aria-hidden="true">
             <use xlink:href="#icon-Fillx"></use>
           </svg>
@@ -75,32 +75,46 @@ export default {
           text: "第八周"
         }
       ],
-      newuserPracticeList: [],
-      newallItemList: []
+      newuserPracticeLists: [],
+      newallItemLists: []
     };
   },
   methods: {
-    getData(url){
-       this.$ajax
+    getData(url) {
+      this.$ajax
         .get(url)
         .then(res => {
-           var olduserPracticeList = res.data.userPracticeList;
-           var oldallItemList=res.data.allItemList;
-           var length1=oldallItemList.length;
-           for(var i=0;i<olduserPracticeList.length;i++){
-            if(length1-olduserPracticeList[i].itemPraList.length==1){
-              olduserPracticeList[i].itemPraList.push({});
-            }
-            if(length1-olduserPracticeList[i].itemPraList.length==2){
-              olduserPracticeList[i].itemPraList.push({},{});
-            }
-          }
-          this.newuserPracticeList=olduserPracticeList
-          this.newallItemList=oldallItemList;
+          this.processData(res.data);
         })
         .catch(err => {
           console.log(err);
         });
+    },
+    //数据处理
+    processData(data) {
+      var newuserPracticeLists = [];
+      var olduserPracticeLists = data.userPracticeList;
+      var oldallItemLists = data.allItemList;
+      var length1 = oldallItemLists.length;
+      for (var idx in olduserPracticeLists) {
+        //console.log(olduserPracticeLists[idx]);
+        var olduserPracticeList = olduserPracticeLists[idx];
+        var itemPraList = olduserPracticeList.itemPraList;
+        var length2 = itemPraList.length;
+        if (length1 - length2 == 1) {
+          itemPraList.push({});
+        }
+        if (length1 - length2 == 2) {
+          itemPraList.push({}, {});
+        }
+        var temp = {
+          days: olduserPracticeList.days,
+          itemPraList: olduserPracticeList.itemPraList
+        };
+        newuserPracticeLists.push(temp);
+      }
+      this.newuserPracticeLists = newuserPracticeLists;
+      this.newallItemLists = oldallItemLists;
     },
     change() {
       var selected = this.selected;
@@ -133,26 +147,22 @@ export default {
       }
       this.weeks = weeks;
       //console.log(weeks);
-      this.getData( `getDataByUser?books=1&weeks=${
-            this.weeks
-          }&userId=${this.userId}`);
+      this.getData(
+        `getDataByUser?books=1&weeks=${this.weeks}&userId=${this.userId}`
+      );
     }
   },
   created() {
     var id = this.$route.query.id;
     //console.log(id);
     this.$ajax
-      .get(
-        "getMemberData?books=1&weeks=1&days=1"
-      )
+      .get("getMemberData?books=1&weeks=1&days=1")
       .then(res => {
         this.chengyuan = res.data.userPracticeList[id - 1].userName;
         //console.log(this.chengyuan);
         this.userId = res.data.userPracticeList[id - 1].userId;
-       // console.log(this.userId);
-        this.getData(`getDataByUser?books=1&weeks=1&userId=${
-              this.userId
-            }`);
+        // console.log(this.userId);
+        this.getData(`getDataByUser?books=1&weeks=1&userId=${this.userId}`);
       })
       .catch(err => {
         console.log(err);
@@ -220,8 +230,7 @@ table td:nth-child(1) {
   margin: 20px auto;
   text-align: center;
 }
-.blackgr{
+.blackgr {
   background-color: rgb(236, 235, 235);
 }
-
 </style>
